@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Calorie Calculator</title>
+
+  <style>
+    :root{
+      --bg1:#fff4f8;
+      --bg2:#fce7f3;
+      --card:#ffffffcc;
+      --accent:#e88fb6;
+      --accent2:#c084fc;
+      --text:#3b2a33;
+      --muted:#7b5b6a;
+      --border:#f2c9dc;
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      background:
+        radial-gradient(600px 400px at 20% 10%, #ffd6e8, transparent 60%),
+        radial-gradient(600px 400px at 80% 20%, #e9d8ff, transparent 60%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+      padding:24px;
+      color:var(--text);
+    }
+    .wrapper{
+      width:min(920px,100%);
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+    }
+    @media(max-width:820px){.wrapper{grid-template-columns:1fr}}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:26px;
+      box-shadow:0 20px 50px rgba(0,0,0,.08);
+      backdrop-filter: blur(8px);
+    }
+    .badge{
+      display:inline-block;
+      padding:6px 14px;
+      border-radius:999px;
+      background:#ffe3f0;
+      color:#b44a7a;
+      font-size:12px;
+      margin-bottom:10px;
+    }
+    h1{margin:0 0 10px;font-size:28px;letter-spacing:-0.02em}
+    p{margin:0 0 18px;color:var(--muted);line-height:1.5}
+
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    input,select{
+      width:100%;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-size:14px;
+    }
+    input:focus,select:focus{outline:none;border-color:var(--accent)}
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-bottom:14px;
+    }
+    @media(max-width:520px){.row{grid-template-columns:1fr}}
+
+    button{
+      width:100%;
+      padding:14px;
+      border-radius:999px;
+      border:none;
+      font-weight:600;
+      font-size:15px;
+      color:white;
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      cursor:pointer;
+    }
+    button:hover{opacity:.96}
+
+    .result{
+      text-align:center;
+      padding:22px;
+      border-radius:18px;
+      border:1px dashed var(--border);
+      background:#fff7fb;
+    }
+    .big{
+      font-size:44px;
+      font-weight:700;
+      margin:12px 0;
+    }
+    .note{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.45}
+    .error{
+      display:none;
+      margin-top:14px;
+      padding:12px;
+      border-radius:14px;
+      background:#ffe0e0;
+      color:#8a1c3a;
+      font-size:13px;
+    }
+    .subtle{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+
+    <!-- INPUT CARD -->
+    <div class="card">
+      <div class="badge">✨ Free Wellness Tool</div>
+      <h1>Daily Calorie Calculator</h1>
+      <p>Quickly calculate your estimated daily calorie needs using basic personal details and activity level.</p>
+
+      <div class="row">
+        <div>
+          <label for="gender">Gender</label>
+          <select id="gender">
+            <option value="female" selected>Female</option>
+            <option value="male">Male</option>
+          </select>
+        </div>
+        <div>
+          <label for="age">Age</label>
+          <input id="age" type="number" min="1" step="1" placeholder="e.g. 32">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="weight">Weight (lbs)</label>
+          <input id="weight" type="number" min="1" step="0.1" placeholder="e.g. 150">
+        </div>
+        <div>
+          <label for="height">Height (inches)</label>
+          <input id="height" type="number" min="1" step="0.1" placeholder="e.g. 65">
+        </div>
+      </div>
+
+      <div>
+        <label for="activity">Activity Level</label>
+        <select id="activity">
+          <option value="1.2">Sedentary (little movement)</option>
+          <option value="1.375">Lightly active</option>
+          <option value="1.55" selected>Moderately active</option>
+          <option value="1.725">Very active</option>
+          <option value="1.9">Extremely active</option>
+        </select>
+      </div>
+
+      <button type="button" onclick="calcCalories()">Calculate</button>
+      <div id="err" class="error"></div>
+
+      <div class="subtle">Ideal for anyone looking to maintain, lose, or gain weight with clarity and confidence.</div>
+      <div class="note">This is an estimate for education and planning. It’s not medical advice 💕</div>
+    </div>
+
+    <!-- RESULT CARD -->
+    <div class="card">
+      <div class="result">
+        <div style="color:var(--muted); font-size:13px;">Your daily calories</div>
+        <div id="cal" class="big">—</div>
+        <div id="msg" class="note">Enter your details to see your estimate.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Uses Harris-Benedict (imperial) for BMR, then multiplies by activity level for TDEE.
+    function calcCalories(){
+      const gender = document.getElementById("gender").value;
+      const age = Number(document.getElementById("age").value);
+      const weight = Number(document.getElementById("weight").value);
+      const height = Number(document.getElementById("height").value);
+      const activity = Number(document.getElementById("activity").value);
+
+      const err = document.getElementById("err");
+      const calEl = document.getElementById("cal");
+      const msgEl = document.getElementById("msg");
+
+      // Basic validation
+      if (!age || !weight || !height || age <= 0 || weight <= 0 || height <= 0) {
+        err.textContent = "Please enter a valid age, height, and weight.";
+        err.style.display = "block";
+        return;
+      }
+
+      let bmr;
+      if (gender === "female") {
+        bmr = 655 + (4.35 * weight) + (4.7 * height) - (4.7 * age);
+      } else {
+        bmr = 66 + (6.23 * weight) + (12.7 * height) - (6.8 * age);
+      }
+
+      const tdee = Math.round(bmr * activity);
+
+      calEl.textContent = `${tdee} kcal`;
+      msgEl.textContent = "Estimated maintenance calories (daily).";
+      err.style.display = "none";
+    }
+  </script>
+</body>
+</html>
