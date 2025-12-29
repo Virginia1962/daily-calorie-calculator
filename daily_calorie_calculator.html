@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Calorie Needs Calculator</title>
+<style>
+:root{
+  --bg1:#fff4f8;
+  --bg2:#fce7f3;
+  --card:#ffffffcc;
+  --accent:#e88fb6;
+  --accent2:#c084fc;
+  --text:#3b2a33;
+  --muted:#7b5b6a;
+  --border:#f2c9dc;
+  --radius:22px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  font-family:Poppins,system-ui,sans-serif;
+  background:
+    radial-gradient(600px 400px at 20% 10%, #ffd6e8, transparent 60%),
+    radial-gradient(600px 400px at 80% 20%, #e9d8ff, transparent 60%),
+    linear-gradient(180deg,var(--bg1),var(--bg2));
+  padding:24px;
+  color:var(--text);
+}
+.wrapper{
+  width:min(920px,100%);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+@media(max-width:820px){.wrapper{grid-template-columns:1fr}}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:26px;
+  box-shadow:0 20px 50px rgba(0,0,0,.08);
+}
+.badge{
+  display:inline-block;
+  padding:6px 14px;
+  border-radius:999px;
+  background:#ffe3f0;
+  color:#b44a7a;
+  font-size:12px;
+  margin-bottom:10px;
+}
+h1{margin:0 0 10px;font-size:28px}
+p{margin:0 0 18px;color:var(--muted)}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+input,select{
+  width:100%;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#fff;
+}
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-bottom:14px;
+}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+button{
+  width:100%;
+  padding:14px;
+  border-radius:999px;
+  border:none;
+  font-weight:600;
+  font-size:15px;
+  color:white;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  cursor:pointer;
+}
+.result{
+  text-align:center;
+  padding:22px;
+  border-radius:18px;
+  border:1px dashed var(--border);
+  background:#fff7fb;
+}
+.big{
+  font-size:44px;
+  font-weight:700;
+  margin:12px 0;
+}
+.note{font-size:12px;color:var(--muted);margin-top:12px}
+.error{
+  display:none;
+  margin-top:14px;
+  padding:12px;
+  border-radius:14px;
+  background:#ffe0e0;
+  color:#8a1c3a;
+  font-size:13px;
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<div class="card">
+  <div class="badge">✨ Free Wellness Tool</div>
+  <h1>Daily Calorie Needs</h1>
+  <p>Estimate how many calories your body needs each day to maintain your weight.</p>
+
+  <div class="row">
+    <div>
+      <label>Gender</label>
+      <select id="gender">
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+      </select>
+    </div>
+    <div>
+      <label>Age</label>
+      <input id="age" type="number" placeholder="e.g. 32">
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label>Weight (lbs)</label>
+      <input id="weight" type="number" placeholder="e.g. 150">
+    </div>
+    <div>
+      <label>Height (inches)</label>
+      <input id="height" type="number" placeholder="e.g. 65">
+    </div>
+  </div>
+
+  <label>Activity Level</label>
+  <select id="activity">
+    <option value="1.2">Sedentary (little movement)</option>
+    <option value="1.375">Lightly active</option>
+    <option value="1.55">Moderately active</option>
+    <option value="1.725">Very active</option>
+    <option value="1.9">Extremely active</option>
+  </select>
+
+  <button onclick="calcCalories()">Calculate</button>
+  <div id="err" class="error"></div>
+  <div class="note">This is a supportive estimate, not a rule 💕</div>
+</div>
+
+<div class="card">
+  <div class="result">
+    <div>Your daily calories</div>
+    <div id="cal" class="big">—</div>
+    <div id="msg" class="note">Enter your details</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function calcCalories(){
+  const g=document.getElementById("gender").value;
+  const a=+document.getElementById("age").value;
+  const w=+document.getElementById("weight").value;
+  const h=+document.getElementById("height").value;
+  const act=+document.getElementById("activity").value;
+  const err=document.getElementById("err");
+
+  if(!a||!w||!h){
+    err.textContent="Please fill in all fields.";
+    err.style.display="block";
+    return;
+  }
+
+  let bmr;
+  if(g==="female"){
+    bmr=655+(4.35*w)+(4.7*h)-(4.7*a);
+  }else{
+    bmr=66+(6.23*w)+(12.7*h)-(6.8*a);
+  }
+
+  const calories=Math.round(bmr*act);
+  document.getElementById("cal").textContent=calories+" kcal";
+  document.getElementById("msg").textContent="Estimated maintenance calories";
+  err.style.display="none";
+}
+</script>
+</body>
+</html>
